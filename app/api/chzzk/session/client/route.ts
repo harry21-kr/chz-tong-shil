@@ -12,7 +12,7 @@ export async function GET() {
   }
 
   const res = await fetch(
-    "https://openapi.chzzk.naver.com/open/v1/sessions/client",
+    "https://openapi.chzzk.naver.com/open/v1/sessions/auth/client",
     {
       method: "GET",
       headers: {

@@ -1,51 +1,18 @@
-import { redirect } from "next/navigation";
+import { cookies } from "next/headers";
 import SocketClient from "./SocketClient";
 
-type AuthTokenResponse = {
-  code: number;
-  message: string;
-  content: AuthTokenContent;
-};
-
-type AuthTokenContent = {
-  refreshToken: string;
-  accessToken: string;
-  expiresIn: number;
-  scope: string;
-};
-
-export default async function Home({
-  searchParams,
-}: {
-  searchParams: { code?: string; state?: string };
-}) {
-  const clientId = process.env.CHZZK_CLIENT_ID || "";
-
-  const { code, state } = await searchParams;
-
+export default async function Home() {
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
+  const cookieStore = await cookies();
 
-  if (!code || !state) {
-    redirect(
-      `https://chzzk.naver.com/account-interlock?clientId=${clientId}&redirectUri=${baseUrl}&state=init`,
-    );
-  }
+  const accessToken = cookieStore.get("chzzk_access_token")?.value;
 
-  const createUserSession = async () => {
-    const res = await fetch(`${baseUrl}/api/chzzk/session/user`, {
+  const createClientSession = async () => {
+    const res = await fetch(`${baseUrl}/api/chzzk/session/client`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
       },
-    });
-
-    return await res.json();
-  };
-
-  const getAccessTokenRes = async () => {
-    const res = await fetch(`${baseUrl}/api/chzzk/token`, {
-      method: "POST",
-      body: JSON.stringify({ code, state }),
     });
 
     return await res.json();
@@ -59,17 +26,14 @@ export default async function Home({
     return data;
   };
 
-  const clientSession = await createUserSession();
+  const clientSession = await createClientSession();
   const clientSessionList = await getUserSessionList();
-  const accessToken = await getAccessTokenRes();
-
-  console.log(accessToken);
 
   return (
     <main>
       <h1>Socket.IO 연결</h1>
       <SocketClient
-        accessToken={accessToken.content.accessToken}
+        accessToken={accessToken ?? ""}
         sessionURL={clientSession.content.url}
         clientSessionList={clientSessionList.content.data}
       />
