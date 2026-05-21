@@ -18,16 +18,7 @@ export default async function Home() {
     return await res.json();
   };
 
-  const getUserSessionList = async () => {
-    const res = await fetch(`${baseUrl}/api/chzzk/session/client`, {
-      method: "GET",
-    });
-    const data = await res.json();
-    return data;
-  };
-
   const clientSession = await createClientSession();
-  const clientSessionList = await getUserSessionList();
 
   return (
     <main>
@@ -35,7 +26,6 @@ export default async function Home() {
       <SocketClient
         accessToken={accessToken ?? ""}
         sessionURL={clientSession.content.url}
-        clientSessionList={clientSessionList.content.data}
       />
     </main>
   );

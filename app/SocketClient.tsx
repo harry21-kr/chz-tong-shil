@@ -7,12 +7,6 @@ import io from "socket.io-client";
 
 interface SocketClientProps {
   sessionURL: string;
-  clientSessionList: {
-    connectedDate: string;
-    disconnectedDate: string;
-    sessionKey: string;
-    subscribedEvents: [];
-  }[];
   accessToken: string;
 }
 
@@ -25,7 +19,6 @@ const socketOption = {
 
 export default function SocketClient({
   sessionURL,
-  clientSessionList,
   accessToken,
 }: SocketClientProps) {
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
